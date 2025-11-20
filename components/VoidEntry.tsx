@@ -21,7 +21,7 @@ export default function VoidEntry() {
       {/* Spiral Video Background */}
       <Video
         ref={videoRef}
-        source={require('../assets/spiral.mp4')} // Adjust path to your video
+        source={require('../assets/spiral.mp4')}
         style={styles.videoBackground}
         resizeMode={ResizeMode.COVER}
         shouldPlay
@@ -35,7 +35,7 @@ export default function VoidEntry() {
 
       {/* Your premium button intact */}
       <TouchableOpacity style={styles.voidButton} onPress={handleEnterVoid}>
-        <Text style={styles.buttonText}>ENTER THE VOID</Text>
+        <Text style={styles.buttonText}>ENTER THE RABBIT HOLE</Text>
         <View style={styles.pulseEffect} />
         <View style={styles.pulseEffect2} />
       </TouchableOpacity>
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   },
   voidButton: {
     backgroundColor: 'transparent',
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: '#8a2be2',
     paddingHorizontal: 40,
     paddingVertical: 20,
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     right: -20,
     bottom: -20,
     borderWidth: 1,
-    borderColor: '#ff00ff',
+    borderColor: '#2f09b6ff',
     borderRadius: 70,
     opacity: 0.4,
   },

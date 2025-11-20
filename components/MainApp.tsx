@@ -6,10 +6,14 @@ import VoidProfile from './VoidProfile';
 import ChillZone from './ChillZone';
 import DiceDuel from './DiceDuel';
 import StaringContest from './StaringContest';
+import TruthOrDare from './TruthOrDare';
+import VoidChess from './VoidChess';
+import VoidStatus from './VoidStatus';
+import CloudVoidStatus from './CloudVoidStatus';
 
 const { width, height } = Dimensions.get('window');
 
-type AppScreen = 'mainMenu' | 'voidProfile' | 'chaosCounter' | 'chillZone' | 'diceDuel' | 'staringContest' | 'truthOrDare' | 'realityTelephone' | 'voidCharades' | 'cardOfChaos';
+type AppScreen = 'mainMenu' | 'voidProfile' | 'chaosCounter' | 'chillZone' | 'diceDuel' | 'staringContest' | 'truthOrDare' | 'voidChess' | 'realityTelephone' | 'voidCharades' | 'cardOfChaos' | 'voidStatus' | 'cloudVoidStatus';
 
 export default function MainApp() {
   const [currentScreen, setCurrentScreen] = useState<AppScreen>('mainMenu');
@@ -242,13 +246,28 @@ if (currentScreen === 'diceDuel') {
   return <DiceDuel onBack={() => setCurrentScreen('chillZone')} />;
 }
 
-// ADD THIS - Handle staringContest as a real game (not placeholder)
 if (currentScreen === 'staringContest') {
   return <StaringContest onBack={() => setCurrentScreen('chillZone')} />;
 }
 
-// UPDATED - Remove staringContest from this array since it's now a real game
-if (['truthOrDare', 'realityTelephone', 'voidCharades', 'cardOfChaos'].includes(currentScreen)) {
+if (currentScreen === 'truthOrDare') {
+  return <TruthOrDare onBack={() => setCurrentScreen('chillZone')} />;
+}
+
+if (currentScreen === 'voidChess') {
+  return <VoidChess onBack={() => setCurrentScreen('chillZone')} />;
+}
+
+if (currentScreen === 'voidStatus') {
+  // Use your existing VoidStatus component
+  return <VoidStatus onBack={() => setCurrentScreen('mainMenu')} userProfile={{ id: 'user_' + Date.now(), name: 'Pub Patron' }} />;
+}
+
+if (currentScreen === 'cloudVoidStatus') {
+  return <CloudVoidStatus onBack={() => setCurrentScreen('mainMenu')} />;
+}
+
+if (['realityTelephone', 'voidCharades', 'cardOfChaos'].includes(currentScreen)) {
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -257,7 +276,6 @@ if (['truthOrDare', 'realityTelephone', 'voidCharades', 'cardOfChaos'].includes(
       />
       <View style={styles.placeholderContainer}>
         <Text style={styles.placeholderTitle}>
-          {currentScreen === 'truthOrDare' && '🎯 TRUTH OR VOID DARE'}
           {currentScreen === 'realityTelephone' && '📞 REALITY TELEPHONE'}
           {currentScreen === 'voidCharades' && '🎭 VOID CHARADES'}
           {currentScreen === 'cardOfChaos' && '🃏 CARD OF CHAOS'}
@@ -381,6 +399,13 @@ if (['truthOrDare', 'realityTelephone', 'voidCharades', 'cardOfChaos'].includes(
             color="#ffff00"
             pulseAnim={pulseAnim}
           />
+          <MenuButton 
+            title="🏪 VOID STATUS" 
+            description="Community pub tracker"
+            onPress={() => setCurrentScreen('cloudVoidStatus')}
+            color="#ff4444"
+            pulseAnim={pulseAnim}
+          />          
         </Animated.View>
 
         {/* Enhanced Interactive Hint */}

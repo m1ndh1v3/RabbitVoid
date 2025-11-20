@@ -28,8 +28,15 @@ export default function ChillZone({ onBack, onNavigateToGame }: ChillZoneProps) 
       title: '🎪 TRUTH OR DARE: VOID EDITION',
       description: 'Psychedelic truths & cosmic dares',
       color: '#ff00ff',
-      comingSoon: true
+      comingSoon: false
     },
+    {
+      id: 'voidChess',
+      title: '♟️ VOID CHESS',
+      description: 'Psychedelic chess with reality-bending chaos mode',
+      color: '#8a2be2',
+      comingSoon: false
+    },    
     {
       id: 'realityTelephone',
       title: '🌀 REALITY TELEPHONE',

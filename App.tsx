@@ -2,13 +2,16 @@ import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
 import VoidEntry from './components/VoidEntry';
+import { AuthProvider } from './components/AuthContext';
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <StatusBar style="light" hidden={true} />
-      <VoidEntry />
-    </View>
+    <AuthProvider>
+      <View style={styles.container}>
+        <StatusBar style="light" hidden={true} />
+        <VoidEntry />
+      </View>
+    </AuthProvider>
   );
 }
 
