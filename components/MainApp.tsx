@@ -433,7 +433,7 @@ if (['realityTelephone', 'voidCharades', 'cardOfChaos'].includes(currentScreen))
           }}
         >
           <Text style={styles.hintText}>
-            🌀 tap anywhere for reality glitch 🌀
+            🌀
           </Text>
         </TouchableOpacity>
       </Animated.View>

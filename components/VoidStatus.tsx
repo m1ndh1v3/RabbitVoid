@@ -817,7 +817,7 @@ const styles = StyleSheet.create({
   tabButtonActive: {
     backgroundColor: 'rgba(138, 43, 226, 0.3)',
     borderWidth: 1,
-    borderColor: '#8a2be2',
+    borderColor: '#321abcff',
   },
   tabIcon: {
     fontSize: 20,
@@ -1128,7 +1128,7 @@ const styles = StyleSheet.create({
   reportTypeButtonActive: {
     backgroundColor: 'rgba(138, 43, 226, 0.3)',
     borderWidth: 1,
-    borderColor: '#8a2be2',
+    borderColor: '#341fccff',
   },
   reportTypeIcon: {
     fontSize: 24,
@@ -1170,7 +1170,7 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(255,255,255,0.1)',
   },
   submitButton: {
-    backgroundColor: '#8a2be2',
+    backgroundColor: '#3a1dcfff',
     paddingVertical: 15,
     borderRadius: 25,
     alignItems: 'center',

@@ -43,13 +43,15 @@ export default function CloudVoidStatus({ onBack }: CloudStatusProps) {
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<number>(Date.now());
+  
+  const [reactions, setReactions] = useState<{[statusId: string]: string[]}>({});
+  const [activeGroup, setActiveGroup] = useState<'public' | string>('public');
+  const [userGroups, setUserGroups] = useState<string[]>(['public', 'secret-coders', 'void-explorers']);
 
-  // Load initial data
   useEffect(() => {
     loadInitialData();
   }, []);
 
-  // Refresh data when tab changes
   useEffect(() => {
     if (activeTab === 'cloud' && isOnline) {
       loadCloudData();
@@ -57,11 +59,9 @@ export default function CloudVoidStatus({ onBack }: CloudStatusProps) {
   }, [activeTab, isOnline]);
 
   const loadInitialData = async () => {
-    // Load local data immediately
-    const localData = await simulateLocalStatuses();
+    const localData = await loadLocalStatuses();
     setLocalStatuses(localData);
 
-    // Preload cloud data if online
     if (isOnline) {
       await loadCloudData();
     }
@@ -79,7 +79,6 @@ export default function CloudVoidStatus({ onBack }: CloudStatusProps) {
     try {
       const cloudData = await CloudService.getRecentStatuses();
       
-      // Transform the data to match our format
       const transformedData: StatusData[] = cloudData.map(item => ({
         id: item.id,
         pub_alias: item.pub_alias,
@@ -105,13 +104,51 @@ export default function CloudVoidStatus({ onBack }: CloudStatusProps) {
     }
   };
 
+  const loadLocalStatuses = async (): Promise<StatusData[]> => {
+    return [];
+  };
+
+  const deleteStatus = async (statusId: string) => {
+    Alert.alert(
+      'Delete Status',
+      'Are you sure you want to delete this status?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Delete', 
+          style: 'destructive',
+          onPress: () => {
+            setLocalStatuses(prev => prev.filter(status => status.id !== statusId));
+            setCloudStatuses(prev => prev.filter(status => status.id !== statusId));
+            
+            setReactions(prev => {
+              const newReactions = { ...prev };
+              delete newReactions[statusId];
+              return newReactions;
+            });
+            
+            console.log(`🗑️ Deleted status: ${statusId}`);
+          }
+        }
+      ]
+    );
+  };
+
+  const addReaction = (statusId: string, emoji: string) => {
+    setReactions(prev => ({
+      ...prev,
+      [statusId]: [...(prev[statusId] || []), emoji]
+    }));
+    console.log(`🎭 Added reaction ${emoji} to status ${statusId}`);
+  };
+
   const onRefresh = async () => {
     console.log('🔄 Manual refresh triggered');
     setRefreshing(true);
     
     try {
       if (activeTab === 'local') {
-        const localData = await simulateLocalStatuses();
+        const localData = await loadLocalStatuses();
         setLocalStatuses(localData);
         console.log('✅ Local data refreshed');
       } else if (isOnline) {
@@ -125,35 +162,6 @@ export default function CloudVoidStatus({ onBack }: CloudStatusProps) {
     } finally {
       setRefreshing(false);
     }
-  };
-
-  const simulateLocalStatuses = async (): Promise<StatusData[]> => {
-    return [
-      {
-        id: 'local1',
-        pub_alias: 'ShadowFox 🦊',
-        status: 'CHATTING',
-        chaos_level: 40,
-        location: 'The Void Tavern',
-        timestamp: Date.now() - 5 * 60 * 1000,
-        drinks_consumed: 1,
-        verified: true,
-        distance: '5m away',
-        source: 'local'
-      },
-      {
-        id: 'local2',
-        pub_alias: 'EchoRaven 🐦‍⬛',
-        status: 'DRINKING',
-        chaos_level: 70,
-        location: 'The Void Tavern', 
-        timestamp: Date.now() - 2 * 60 * 1000,
-        drinks_consumed: 2,
-        verified: true,
-        distance: 'Same table',
-        source: 'local'
-      }
-    ];
   };
 
   const submitStatus = async (status: string, chaos: number) => {
@@ -176,7 +184,6 @@ export default function CloudVoidStatus({ onBack }: CloudStatusProps) {
     try {
       console.log('📤 Submitting status:', statusData);
 
-      // Always add to local view immediately
       const localStatus: StatusData = {
         id: `local_${Date.now()}`,
         ...statusData,
@@ -191,17 +198,14 @@ export default function CloudVoidStatus({ onBack }: CloudStatusProps) {
       let cloudSuccess = false;
 
       if (isOnline) {
-        // Submit to cloud using your CloudService
         cloudSuccess = await CloudService.submitStatus(statusData);
         console.log(`📊 Cloud submission: ${cloudSuccess ? 'SUCCESS' : 'FAILED'}`);
         
-        // Refresh cloud data to show the new status
         if (cloudSuccess && activeTab === 'cloud') {
           setTimeout(() => loadCloudData(), 1000);
         }
       }
 
-      // Show success message
       if (isOnline) {
         if (cloudSuccess) {
           Alert.alert('🌀 Status Broadcasted!', 'Your status is now visible locally and across the void network!');
@@ -218,6 +222,29 @@ export default function CloudVoidStatus({ onBack }: CloudStatusProps) {
     }
   };
 
+  const GroupSelector = () => (
+    <View style={styles.groupSelector}>
+      <Text style={styles.groupTitle}>VOID CIRCLE:</Text>
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        style={styles.groupScroll}
+      >
+        {userGroups.map(group => (
+          <TouchableOpacity
+            key={group}
+            style={[styles.groupTab, activeGroup === group && styles.activeGroupTab]}
+            onPress={() => setActiveGroup(group)}
+          >
+            <Text style={styles.groupText}>
+              {group === 'public' ? '🌐 PUBLIC' : `🤫 ${group.toUpperCase()}`}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
+  );
+
   const StatusCard = ({ status, isUser = false }: { status: StatusData; isUser?: boolean }) => (
     <View style={[styles.statusCard, isUser && styles.userStatusCard]}>
       <View style={styles.statusHeader}>
@@ -227,6 +254,11 @@ export default function CloudVoidStatus({ onBack }: CloudStatusProps) {
           {status.distance && <Text style={styles.distance}>{status.distance}</Text>}
           {status.source === 'cloud' && <Text style={styles.cloudBadge}>🌐</Text>}
           {status.source === 'user' && <Text style={styles.userBadge}>YOU</Text>}
+          {isUser && (
+            <TouchableOpacity onPress={() => deleteStatus(status.id)} style={styles.deleteButton}>
+              <Text style={styles.deleteText}>🗑️</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       
@@ -239,6 +271,27 @@ export default function CloudVoidStatus({ onBack }: CloudStatusProps) {
         </View>
         <Text style={styles.chaos}>Chaos Level: {status.chaos_level}%</Text>
         <Text style={styles.location}>📍 {status.location}</Text>
+      </View>
+      
+      <View style={styles.reactionsContainer}>
+        <View style={styles.reactionButtons}>
+          {['🔥', '😂', '🎯', '❤️', '👀'].map(emoji => (
+            <TouchableOpacity 
+              key={emoji} 
+              onPress={() => addReaction(status.id, emoji)}
+              style={styles.reactionButton}
+            >
+              <Text style={styles.reactionEmoji}>{emoji}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        {(reactions[status.id] || []).length > 0 && (
+          <View style={styles.reactionDisplay}>
+            <Text style={styles.reactionCount}>
+              {reactions[status.id]?.join(' ')}
+            </Text>
+          </View>
+        )}
       </View>
       
       <View style={styles.statusFooter}>
@@ -286,7 +339,6 @@ export default function CloudVoidStatus({ onBack }: CloudStatusProps) {
         style={StyleSheet.absoluteFill}
       />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
           <Text style={styles.backText}>←</Text>
@@ -301,7 +353,8 @@ export default function CloudVoidStatus({ onBack }: CloudStatusProps) {
         <View style={styles.placeholder} />
       </View>
 
-      {/* Tab Navigation */}
+      <GroupSelector />
+
       <View style={styles.tabContainer}>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'local' && styles.activeTab]}
@@ -341,7 +394,6 @@ export default function CloudVoidStatus({ onBack }: CloudStatusProps) {
           {loading && ' 🔄'}
         </Text>
 
-        {/* Loading State */}
         {loading && activeTab === 'cloud' && (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#00ffff" />
@@ -349,7 +401,6 @@ export default function CloudVoidStatus({ onBack }: CloudStatusProps) {
           </View>
         )}
 
-        {/* Status List */}
         {hasData ? (
           currentStatuses.map((status) => (
             <StatusCard 
@@ -381,7 +432,6 @@ export default function CloudVoidStatus({ onBack }: CloudStatusProps) {
           )
         )}
 
-        {/* Connection Status */}
         <View style={[
           styles.connectionStatus, 
           isOnline ? styles.connectionOnline : styles.connectionOffline
@@ -401,7 +451,6 @@ export default function CloudVoidStatus({ onBack }: CloudStatusProps) {
   );
 }
 
-// Helper functions
 const getStatusColor = (status: string) => {
   const colors: { [key: string]: string } = {
     'CHILL': '#00ff00',
@@ -462,6 +511,38 @@ const styles = StyleSheet.create({
   },
   placeholder: {
     width: 40,
+  },
+  groupSelector: {
+    paddingHorizontal: 20,
+    marginBottom: 15,
+  },
+  groupTitle: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  groupScroll: {
+    maxHeight: 40,
+  },
+  groupTab: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    marginHorizontal: 4,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  activeGroupTab: {
+    backgroundColor: 'rgba(138, 43, 226, 0.3)',
+    borderColor: '#8a2be2',
+  },
+  groupText: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   tabContainer: {
     flexDirection: 'row',
@@ -597,6 +678,14 @@ const styles = StyleSheet.create({
     paddingVertical: 1,
     borderRadius: 4,
   },
+  deleteButton: {
+    marginLeft: 8,
+    padding: 4,
+  },
+  deleteText: {
+    fontSize: 12,
+    color: 'rgba(255,0,0,0.7)',
+  },
   statusBody: {
     marginBottom: 8,
   },
@@ -625,6 +714,30 @@ const styles = StyleSheet.create({
   location: {
     color: 'rgba(255,255,255,0.6)',
     fontSize: 11,
+  },
+  reactionsContainer: {
+    marginVertical: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+  },
+  reactionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 6,
+  },
+  reactionButton: {
+    padding: 4,
+  },
+  reactionEmoji: {
+    fontSize: 16,
+  },
+  reactionDisplay: {
+    alignItems: 'center',
+  },
+  reactionCount: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 14,
   },
   statusFooter: {
     flexDirection: 'row',

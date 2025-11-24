@@ -9,7 +9,7 @@ interface User {
   created_at: string;
   pub_alias?: string;
   trust_score: number;
-  device_id: string; // This is required
+  device_id: string;
 }
 
 interface AuthContextType {
@@ -51,7 +51,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => clearInterval(interval);
   };
 
-  // FIXED: Ensure device_id is always available
   const getDeviceId = async (): Promise<string> => {
     try {
       let deviceId = await AsyncStorage.getItem('device_id');
@@ -65,7 +64,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return deviceId;
     } catch (error) {
       console.error('Error getting device ID:', error);
-      // Fallback device ID
       return `fallback_device_${Date.now()}`;
     }
   };
@@ -75,7 +73,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const storedUser = await AsyncStorage.getItem('void_user');
       if (storedUser) {
         const userData = JSON.parse(storedUser);
-        // FIXED: Ensure existing users have device_id
         if (!userData.device_id) {
           userData.device_id = await getDeviceId();
           await AsyncStorage.setItem('void_user', JSON.stringify(userData));
@@ -106,7 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         created_at: new Date().toISOString(),
         pub_alias: pubAlias,
         trust_score: 50,
-        device_id: deviceId // FIXED: Always include device_id
+        device_id: deviceId
       };
 
       await AsyncStorage.setItem('void_user', JSON.stringify(newUser));
@@ -115,7 +112,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     } catch (error) {
       console.error('Error creating anonymous user:', error);
-      // Fallback to in-memory user with device_id
       const fallbackUser: User = {
         id: 'fallback_anon',
         username: 'anonymous',
@@ -153,7 +149,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         created_at: new Date().toISOString(),
         pub_alias: username,
         trust_score: 50,
-        device_id: deviceId // FIXED: Always include device_id
+        device_id: deviceId
       };
 
       await AsyncStorage.setItem('void_user', JSON.stringify(newUser));

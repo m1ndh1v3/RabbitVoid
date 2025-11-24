@@ -35,7 +35,7 @@ export default function VoidEntry() {
 
       {/* Your premium button intact */}
       <TouchableOpacity style={styles.voidButton} onPress={handleEnterVoid}>
-        <Text style={styles.buttonText}>ENTER THE RABBIT HOLE</Text>
+        <Text style={styles.buttonText}>ENTER THE VOID</Text>
         <View style={styles.pulseEffect} />
         <View style={styles.pulseEffect2} />
       </TouchableOpacity>
@@ -65,23 +65,23 @@ const styles = StyleSheet.create({
   voidButton: {
     backgroundColor: 'transparent',
     borderWidth: 3,
-    borderColor: '#8a2be2',
+    borderColor: '#451da3ff',
     paddingHorizontal: 40,
     paddingVertical: 20,
     borderRadius: 50,
     position: 'relative',
-    shadowColor: '#8a2be2',
+    shadowColor: '#2914a4ff',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.9,
     shadowRadius: 25,
     elevation: 10,
   },
   buttonText: {
-    color: '#00ffff',
+    color: '#3189dbff',
     fontSize: 20,
     fontWeight: 'bold',
     letterSpacing: 3,
-    textShadowColor: '#8a2be2',
+    textShadowColor: '#291a99ff',
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 10,
   },
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     right: -10,
     bottom: -10,
     borderWidth: 1,
-    borderColor: '#00ffff',
+    borderColor: '#1a74daff',
     borderRadius: 60,
     opacity: 0.7,
   },
@@ -114,19 +114,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   introTitle: {
-    color: '#00ffff',
+    color: '#1b65b4ff',
     fontSize: 30,
     fontWeight: 'bold',
     letterSpacing: 3,
-    textShadowColor: '#712ab4ff',
+    textShadowColor: '#411d96ff',
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 10,
   },
   voidText: {
-    color: '#ff00ff',
+    color: '#472680ff',
     fontSize: 24,
     fontWeight: 'bold',
-    textShadowColor: '#8a2be2',
+    textShadowColor: '#4323b7ff',
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 15,
   },
